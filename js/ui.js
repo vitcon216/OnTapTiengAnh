@@ -21,6 +21,33 @@ export class UIManager {
         this._unlockedAchievements = new Set(
             JSON.parse(localStorage.getItem('engvocab_achievements') || '[]')
         );
+        
+        // Audio elements & mobile unlock policy
+        this.ttsAudio = new Audio();
+        this._audioUnlocked = false;
+        
+        const unlock = () => {
+            if (this._audioUnlocked) return;
+            // Unlock HTML Audio by playing a silent sound
+            this.ttsAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+            this.ttsAudio.volume = 0;
+            this.ttsAudio.play().then(() => {
+                this.ttsAudio.pause();
+                this.ttsAudio.volume = 1;
+            }).catch(() => {});
+            
+            // Unlock Web Speech API
+            const utt = new SpeechSynthesisUtterance('');
+            utt.volume = 0;
+            this.synth.speak(utt);
+            
+            this._audioUnlocked = true;
+            document.removeEventListener('touchstart', unlock);
+            document.removeEventListener('click', unlock);
+        };
+        
+        document.addEventListener('touchstart', unlock);
+        document.addEventListener('click', unlock);
     }
 
     /* ── Navigation ──────────────────────────── */
@@ -96,10 +123,11 @@ export class UIManager {
         
         // Sử dụng Google TTS API để đồng bộ giọng đọc trên mọi thiết bị (kể cả iPhone)
         const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en-US&client=tw-ob&q=${encodeURIComponent(text)}`;
-        const audio = new Audio(url);
-        audio.playbackRate = rate;
+        this.ttsAudio.src = url;
+        this.ttsAudio.playbackRate = rate;
+        this.ttsAudio.volume = 1;
         
-        audio.play().catch(err => {
+        this.ttsAudio.play().catch(err => {
             console.warn("Lỗi tải âm thanh từ mạng, quay về dùng giọng mặc định của máy:", err);
             // Dự phòng: Nếu mất mạng, dùng lại giọng có sẵn trên máy
             this.synth.cancel();
