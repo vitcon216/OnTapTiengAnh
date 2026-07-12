@@ -93,12 +93,22 @@ export class UIManager {
     /* ── TTS ─────────────────────────────────── */
     speak(text, rate = 1) {
         if (!text) return;
-        this.synth.cancel();
-        const utt  = new SpeechSynthesisUtterance(text);
-        utt.lang   = 'en-US';
-        utt.rate   = rate;
-        utt.pitch  = 1;
-        this.synth.speak(utt);
+        
+        // Sử dụng Google TTS API để đồng bộ giọng đọc trên mọi thiết bị (kể cả iPhone)
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en-US&client=tw-ob&q=${encodeURIComponent(text)}`;
+        const audio = new Audio(url);
+        audio.playbackRate = rate;
+        
+        audio.play().catch(err => {
+            console.warn("Lỗi tải âm thanh từ mạng, quay về dùng giọng mặc định của máy:", err);
+            // Dự phòng: Nếu mất mạng, dùng lại giọng có sẵn trên máy
+            this.synth.cancel();
+            const utt  = new SpeechSynthesisUtterance(text);
+            utt.lang   = 'en-US';
+            utt.rate   = rate;
+            utt.pitch  = 1;
+            this.synth.speak(utt);
+        });
     }
 
     /* ── Toast ───────────────────────────────── */
@@ -289,6 +299,10 @@ export class UIManager {
 
     updateHearts(count) {
         const el = document.getElementById('hearts-display');
+        if (count > 10) {
+            el.innerHTML = `<span style="font-size:0.9em; opacity:0.8; font-weight:600;"><i class="ph-fill ph-student"></i> Học không giới hạn</span>`;
+            return;
+        }
         el.innerHTML = Array.from({ length: 3 }, (_, i) =>
             `<i class="ph${i < count ? '-fill' : ''} ph-heart"></i>`
         ).join('');

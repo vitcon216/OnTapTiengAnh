@@ -18,6 +18,11 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/animations.css">
+    
+    <!-- Web App Manifest for PWA (Installable App) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4F46E5">
+    <link rel="apple-touch-icon" href="assets/icon.svg">
 </head>
 <body>
 
@@ -147,6 +152,15 @@
                 <div class="progress-track">
                     <div class="progress-fill" id="overall-progress" style="width:0%"></div>
                 </div>
+            </div>
+            <!-- Daily New Words -->
+            <div class="card challenge-card" id="daily-learn-new" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(88,204,2,0.1), rgba(28,176,246,0.1)); border: 2px solid var(--primary);">
+                <div class="challenge-icon"><i class="ph-fill ph-student" style="color:var(--primary)"></i></div>
+                <div class="challenge-body">
+                    <h3 style="color:var(--primary)">Học từ mới hôm nay</h3>
+                    <p>Khám phá 50 từ chưa học với 4 phương pháp trộn lẫn!</p>
+                </div>
+                <button class="btn btn-primary" id="btn-learn-new">Học ngay</button>
             </div>
 
             <!-- Daily challenge -->
@@ -502,5 +516,14 @@
 <div id="toast-container"></div>
 
 <script type="module" src="js/app.js"></script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registered', reg))
+                .catch(err => console.error('Service Worker registration failed', err));
+        });
+    }
+</script>
 </body>
 </html>

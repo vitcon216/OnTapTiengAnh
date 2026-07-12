@@ -1,0 +1,17 @@
+{
+  "name": "EngVocab — Học Từ Vựng",
+  "short_name": "EngVocab",
+  "description": "Ứng dụng học từ vựng tiếng Anh thông minh theo phong cách Duolingo & Quizlet với Spaced Repetition",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4F46E5",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}

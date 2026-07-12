@@ -43,12 +43,16 @@ class App {
 
         // ── 5. Dashboard quick-actions ──
         document.getElementById('btn-quick-review').addEventListener('click', () => {
-            this.ui.navigate('flashcards');
-            this._onViewEnter('flashcards');
+            this.ui.navigate('quiz');
+            this.qz.startQuickReviewMixed();
         });
         document.getElementById('btn-challenge').addEventListener('click', () => {
             this.ui.navigate('quiz');
             this._onViewEnter('quiz');
+        });
+        document.getElementById('btn-learn-new').addEventListener('click', () => {
+            this.ui.navigate('quiz');
+            this.qz.startDailyNew();
         });
 
         // Mode cards on dashboard

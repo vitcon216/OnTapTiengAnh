@@ -8,6 +8,7 @@ const SR_INTERVALS = [0, 12, 24, 72, 168, 336]; // levels 0-5
 const LS_KEY_PROGRESS = 'engvocab_progress';
 const LS_KEY_STATS    = 'engvocab_stats';
 const LS_KEY_THEME    = 'engvocab_theme';
+const LS_KEY_DAILY_NEW = 'engvocab_daily_new';
 
 export class DataManager {
     constructor() {
@@ -143,15 +144,52 @@ export class DataManager {
     /* ── Computed getters ────────────────────── */
     get totalWords()   { return this.words.length; }
 
+    getDailyNewWords() {
+        const today = new Date().toDateString();
+        let stored = null;
+        try { stored = JSON.parse(localStorage.getItem(LS_KEY_DAILY_NEW)); } catch {}
+
+        if (stored && stored.date === today && Array.isArray(stored.words)) {
+            const validIds = stored.words.filter(id => {
+                const p = this.progress[id];
+                return !p || (p.correct === 0 && p.wrong === 0);
+            });
+            if (validIds.length > 0) {
+                const validWords = validIds.map(id => this.words.find(w => w.id === id)).filter(Boolean);
+                if (validWords.length > 0) return validWords;
+            }
+        }
+
+        const unlearned = this.words.filter(w => {
+            const p = this.progress[w.id];
+            return !p || (p.correct === 0 && p.wrong === 0);
+        });
+        
+        for (let i = unlearned.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [unlearned[i], unlearned[j]] = [unlearned[j], unlearned[i]];
+        }
+        const selected = unlearned.slice(0, 50);
+
+        localStorage.setItem(LS_KEY_DAILY_NEW, JSON.stringify({
+            date: today,
+            words: selected.map(w => w.id)
+        }));
+        return selected;
+    }
+
     get learnedWords() {
-        return this.words.filter(w => this.progress[w.id]?.level > 0);
+        return this.words.filter(w => {
+            const p = this.progress[w.id];
+            return p && (p.correct > 0 || p.wrong > 0);
+        });
     }
 
     get dueWords() {
         const now = Date.now();
         return this.words.filter(w => {
             const p = this.progress[w.id];
-            return p && (p.level === 0 || p.nextReview <= now);
+            return p && (p.correct > 0 || p.wrong > 0) && (p.level === 0 || p.nextReview <= now);
         });
     }
 
