@@ -107,7 +107,7 @@ export class QuizMode {
             <button class="btn btn-primary btn-full" id="fc-understood-btn">Đã hiểu (Enter)</button>
         `;
         
-        setTimeout(() => this.ui.speak(w.word), 300);
+        this.ui.speak(w.word);
 
         const btn = body.querySelector('#fc-understood-btn');
         btn.focus();
@@ -233,7 +233,7 @@ export class QuizMode {
         });
 
         // Auto speak
-        setTimeout(() => this.ui.speak(w.word), 400);
+        this.ui.speak(w.word);
     }
 
     /* ── Handle result ───────────────────────── */

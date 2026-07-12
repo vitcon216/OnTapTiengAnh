@@ -86,8 +86,10 @@ export class FlashcardMode {
 
         this.ui.updateFcCounter(this.idx + 1, this.queue.length);
 
-        // Auto speak
-        setTimeout(() => this.ui.speak(w.word), 300);
+        // Auto speak (only on first word, subsequent words are spoken in _answer to bypass iOS restrictions)
+        if (this.idx === 0) {
+            this.ui.speak(w.word);
+        }
     }
 
     _flip() {
@@ -99,6 +101,10 @@ export class FlashcardMode {
         const w = this.queue[this.idx];
         if (!w) return;
         this.dm.recordAnswer(w.id, isCorrect);
+
+        // Phát âm từ tiếp theo ngay lập tức để không bị iOS chặn (vì phải nằm trong stack của click event)
+        const nextW = this.queue[this.idx + 1];
+        if (nextW) this.ui.speak(nextW.word);
 
         // Animate card out
         const card = document.getElementById('flashcard');
