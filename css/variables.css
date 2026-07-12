@@ -1,0 +1,74 @@
+/* ============================================
+   VARIABLES.CSS — Design Tokens & Themes
+   ============================================ */
+
+:root {
+  /* === Brand Colors === */
+  --green:       #58CC02;
+  --green-dark:  #46A302;
+  --green-light: #D7F5B1;
+  --blue:        #1CB0F6;
+  --blue-dark:   #1899D6;
+  --blue-light:  #DDF4FF;
+  --yellow:      #FFC800;
+  --yellow-dark: #E5AC00;
+  --red:         #FF4B4B;
+  --red-dark:    #EA2B2B;
+  --red-light:   #FFE0E0;
+  --purple:      #8B5CF6;
+  --orange:      #F97316;
+
+  /* === Neutral Palette (Light Mode) === */
+  --bg:          #F9FAFB;
+  --bg2:         #FFFFFF;
+  --surface:     #FFFFFF;
+  --surface2:    #F3F4F6;
+  --border:      #E5E7EB;
+  --border2:     #D1D5DB;
+  --text:        #111827;
+  --text2:       #374151;
+  --text3:       #6B7280;
+  --text4:       #9CA3AF;
+
+  /* === Shadows === */
+  --shadow-xs:   0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.12);
+  --shadow-card: 0 4px 0 var(--border);
+
+  /* === Radius === */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-pill: 999px;
+
+  /* === Sidebar === */
+  --sidebar-w:   240px;
+  --topbar-h:    64px;
+
+  /* === Transitions === */
+  --ease:        cubic-bezier(0.4, 0, 0.2, 1);
+  --duration:    0.25s;
+}
+
+/* Dark Mode */
+[data-theme="dark"] {
+  --bg:          #0F1923;
+  --bg2:         #162028;
+  --surface:     #1A2A35;
+  --surface2:    #223040;
+  --border:      #2D4050;
+  --border2:     #3A5065;
+  --text:        #F8FAFC;
+  --text2:       #CBD5E1;
+  --text3:       #94A3B8;
+  --text4:       #64748B;
+
+  --shadow-xs:   0 1px 2px rgba(0,0,0,0.3);
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.4);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.6);
+  --shadow-card: 0 4px 0 rgba(0,0,0,0.4);
+}

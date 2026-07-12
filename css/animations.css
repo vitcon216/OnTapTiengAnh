@@ -1,0 +1,115 @@
+/* ============================================
+   ANIMATIONS.CSS — Keyframes & Micro-animations
+   ============================================ */
+
+/* ── Core ── */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0%   { transform: scale(0.85); opacity: 0; }
+  60%  { transform: scale(1.04); }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60%  { transform: translateX(-8px); }
+  40%, 80%  { transform: translateX(8px); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.06); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  30%       { transform: scale(1.25); }
+  60%       { transform: scale(0.95); }
+}
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(80px)  rotate(360deg); opacity: 0; }
+}
+
+/* ── Utility classes ── */
+.anim-shake {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+.anim-pop {
+  animation: popIn 0.35s var(--ease) both;
+}
+.anim-pulse {
+  animation: pulse 0.5s var(--ease);
+}
+.anim-heartbeat {
+  animation: heartbeat 0.4s var(--ease);
+}
+
+/* ── Word Item hover micro ── */
+.word-item { position: relative; overflow: hidden; }
+.word-item::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--blue);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.2s var(--ease);
+}
+.word-item:hover::after { transform: scaleY(1); }
+
+/* ── Button press effect ── */
+.btn-primary:active { transform: scale(0.97); }
+
+/* ── Progress animated ── */
+.progress-fill { position: relative; overflow: hidden; }
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer {
+  to { left: 200%; }
+}
+
+/* ── Skeleton loader ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-load 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes skeleton-load {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ── Confetti particle ── */
+.confetti-particle {
+  position: fixed;
+  pointer-events: none;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  animation: confetti-fall 0.8s ease-out forwards;
+  z-index: 9999;
+}

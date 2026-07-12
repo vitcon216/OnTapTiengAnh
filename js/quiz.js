@@ -1,0 +1,220 @@
+/**
+ * quiz.js — Multiple-choice, Fill-blank, Listening, Spaced-Rep, Wrong-words modes
+ */
+export class QuizMode {
+    constructor(dm, ui) {
+        this.dm        = dm;
+        this.ui        = ui;
+        this.questions = [];
+        this.idx       = 0;
+        this.hearts    = 3;
+        this.type      = '';
+        this.answered  = false;
+    }
+
+    init() {
+        document.querySelectorAll('.quiz-card-option').forEach(card => {
+            card.addEventListener('click', () => this._startQuiz(card.dataset.type));
+        });
+        document.getElementById('quiz-exit').addEventListener('click', () => this._exitQuiz());
+    }
+
+    /* ── Public: start from other modules ── */
+    startSpacedRep() { this._startQuiz('spaced-rep'); }
+    startWrongWords() { this._startQuiz('wrong-words'); }
+
+    /* ── Quiz lifecycle ─────────────────────── */
+    _startQuiz(type) {
+        const allWords = this.dm.words;
+        if (allWords.length < 4) {
+            this.ui.toast('Cần ít nhất 4 từ để tạo quiz!', 'error');
+            return;
+        }
+
+        let pool;
+        if (type === 'spaced-rep')  pool = this.dm.dueWords;
+        else if (type === 'wrong-words') pool = this.dm.wrongWords.slice(0, 20);
+        else                        pool = this.ui.shuffle([...allWords]);
+
+        if (pool.length === 0) {
+            this.ui.toast('Không có từ nào cần ôn tập!', 'info');
+            return;
+        }
+
+        this.questions = this.ui.shuffle(pool).slice(0, 10);
+        this.idx       = 0;
+        this.hearts    = 3;
+        this.type      = type === 'spaced-rep' || type === 'wrong-words' ? 'multiple-choice' : type;
+        this.answered  = false;
+
+        document.getElementById('quiz-menu').classList.add('hidden');
+        document.getElementById('quiz-active').classList.remove('hidden');
+        this.ui.updateHearts(this.hearts);
+        this._renderQuestion();
+    }
+
+    _renderQuestion() {
+        if (this.idx >= this.questions.length) { this._finish(); return; }
+        if (this.hearts <= 0)                  { this._finish(true); return; }
+
+        this.answered = false;
+        this.ui.updateQuizProgress(this.idx, this.questions.length);
+
+        const w = this.questions[this.idx];
+        const body = document.getElementById('quiz-body');
+        body.innerHTML = '';
+
+        if (this.type === 'multiple-choice') this._renderMC(w, body);
+        else if (this.type === 'fill-blank') this._renderFill(w, body);
+        else if (this.type === 'listening')  this._renderListen(w, body);
+    }
+
+    /* ── Multiple Choice ─────────────────────── */
+    _renderMC(w, body) {
+        const distractors = this.ui.pickDistractors(w, this.dm.words, 3);
+        const options     = this.ui.shuffle([w, ...distractors]);
+
+        body.innerHTML = `
+            <p class="quiz-question-label">Từ nào có nghĩa:</p>
+            <p class="quiz-question">"${w.meaning}"</p>
+            <div class="options-list" id="options"></div>
+        `;
+        const ol = body.querySelector('#options');
+        options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="opt-key">${i + 1}</span>${opt.word}`;
+            btn.dataset.id = opt.id;
+            btn.addEventListener('click', (e) => this._checkMC(w.id, btn, e));
+            ol.appendChild(btn);
+        });
+    }
+
+    _checkMC(correctId, btn, e) {
+        if (this.answered) return;
+        this.answered = true;
+        const isCorrect = btn.dataset.id === correctId;
+
+        document.querySelectorAll('.option-btn').forEach(b => {
+            b.disabled = true;
+            if (b.dataset.id === correctId) b.classList.add('correct');
+            else if (b === btn && !isCorrect) b.classList.add('wrong');
+        });
+
+        this._handleResult(isCorrect, e);
+    }
+
+    /* ── Fill Blank ──────────────────────────── */
+    _renderFill(w, body) {
+        const blank = (w.example || '').replace(new RegExp(`\\b${w.word}\\b`, 'gi'), '_______');
+        body.innerHTML = `
+            <p class="quiz-question-label">Điền từ vào chỗ trống:</p>
+            <p class="quiz-question">${blank || `Nghĩa: "${w.meaning}"`}</p>
+            ${w.translation ? `<p style="font-size:13px;color:var(--text3);margin-bottom:12px">${w.translation}</p>` : ''}
+            <div class="fill-input-wrap">
+                <input type="text" id="fill-input" class="fill-input" placeholder="Gõ từ tiếng Anh..." autocomplete="off" autocorrect="off" spellcheck="false">
+                <button class="btn btn-primary btn-full" id="fill-submit">Kiểm tra (Enter)</button>
+            </div>
+        `;
+
+        const input   = body.querySelector('#fill-input');
+        const submit  = body.querySelector('#fill-submit');
+        const checkFn = (e) => {
+            if (this.answered) return;
+            this.answered = true;
+            const val       = input.value.trim().toLowerCase();
+            const isCorrect = val === w.word.toLowerCase();
+            input.classList.add(isCorrect ? 'correct' : 'wrong');
+            if (!isCorrect) input.value = w.word; // show correct answer
+            this._handleResult(isCorrect, e);
+        };
+        submit.addEventListener('click', checkFn);
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkFn(e); });
+        setTimeout(() => input.focus(), 100);
+    }
+
+    /* ── Listening ───────────────────────────── */
+    _renderListen(w, body) {
+        const distractors = this.ui.pickDistractors(w, this.dm.words, 3);
+        const options     = this.ui.shuffle([w, ...distractors]);
+
+        body.innerHTML = `
+            <p class="quiz-question-label">Nghe và chọn từ đúng:</p>
+            <div class="listen-btn-wrap">
+                <button class="btn-listen-big" id="listen-btn"><i class="ph-fill ph-speaker-high"></i></button>
+                <p style="font-size:13px;color:var(--text3);margin-top:8px">Nhấn để nghe lại</p>
+            </div>
+            <div class="options-list" id="options"></div>
+        `;
+
+        body.querySelector('#listen-btn').addEventListener('click', () => this.ui.speak(w.word));
+
+        const ol = body.querySelector('#options');
+        options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="opt-key">${i + 1}</span>${opt.word}`;
+            btn.dataset.id = opt.id;
+            btn.addEventListener('click', (e) => this._checkMC(w.id, btn, e));
+            ol.appendChild(btn);
+        });
+
+        // Auto speak
+        setTimeout(() => this.ui.speak(w.word), 400);
+    }
+
+    /* ── Handle result ───────────────────────── */
+    _handleResult(isCorrect, e) {
+        const w = this.questions[this.idx];
+        this.dm.recordAnswer(w.id, isCorrect);
+
+        if (isCorrect) {
+            this.ui.showResult(true, e);
+        } else {
+            this.hearts--;
+            this.ui.updateHearts(this.hearts);
+            document.getElementById('quiz-body').classList.add('anim-shake');
+            setTimeout(() => document.getElementById('quiz-body').classList.remove('anim-shake'), 500);
+            this.ui.showResult(false, e);
+        }
+
+        setTimeout(() => {
+            this.idx++;
+            this._renderQuestion();
+        }, 1300);
+    }
+
+    /* ── Finish ──────────────────────────────── */
+    _finish(failed = false) {
+        this._exitQuiz();
+        if (failed) {
+            this.ui.toast('Hết mạng! Cố gắng hơn lần sau nhé.', 'error');
+        } else {
+            this.ui.toast('🎉 Hoàn thành bài ôn tập!', 'success');
+        }
+        document.dispatchEvent(new Event('stats-updated'));
+    }
+
+    _exitQuiz() {
+        document.getElementById('quiz-active').classList.add('hidden');
+        document.getElementById('quiz-menu').classList.remove('hidden');
+    }
+
+    /* ── Keyboard ────────────────────────────── */
+    handleKey(key) {
+        if (document.getElementById('quiz-active').classList.contains('hidden')) return false;
+
+        // Number keys for MC / Listening
+        if (['1','2','3','4'].includes(key)) {
+            const btns = document.querySelectorAll('.option-btn:not(:disabled)');
+            const idx  = parseInt(key) - 1;
+            if (btns[idx]) { btns[idx].click(); return true; }
+        }
+        // Enter for fill-blank
+        if (key === 'Enter') {
+            const btn = document.getElementById('fill-submit');
+            if (btn) { btn.click(); return true; }
+        }
+        return false;
+    }
+}

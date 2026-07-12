@@ -1,0 +1,123 @@
+/* ============================================
+   COMPONENTS.CSS — Buttons & misc components
+   ============================================ */
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 11px 22px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn:active { transform: translateY(2px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-primary {
+  background: var(--green);
+  color: #fff;
+  box-shadow: 0 4px 0 var(--green-dark);
+}
+.btn-primary:hover:not(:disabled) { background: #64DC03; box-shadow: 0 4px 0 var(--green-dark); }
+.btn-primary:active { box-shadow: none; }
+
+.btn-secondary {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 4px 0 var(--blue-dark);
+}
+.btn-secondary:hover:not(:disabled) { background: #2FC0FF; }
+.btn-secondary:active { box-shadow: none; }
+
+.btn-danger {
+  background: var(--red);
+  color: #fff;
+  box-shadow: 0 4px 0 var(--red-dark);
+}
+.btn-danger:hover:not(:disabled) { background: #FF6060; }
+.btn-danger:active { box-shadow: none; }
+
+.btn-success {
+  background: var(--green);
+  color: #fff;
+  box-shadow: 0 4px 0 var(--green-dark);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text2);
+  border: 2px solid var(--border);
+  box-shadow: 0 4px 0 var(--border);
+}
+.btn-ghost:hover:not(:disabled) { background: var(--surface2); }
+.btn-ghost:active { box-shadow: none; }
+
+.btn-outline {
+  background: transparent;
+  color: var(--blue);
+  border: 2px solid var(--blue);
+}
+.btn-outline:hover { background: rgba(28,176,246,0.08); }
+
+.btn-full { width: 100%; }
+.btn-sm { padding: 7px 14px; font-size: 13px; }
+.btn-hero { font-size: 16px; padding: 14px 28px; }
+
+/* ── Icon Buttons ── */
+.btn-icon {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text3);
+  font-size: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-icon:hover { background: var(--surface2); color: var(--text); }
+
+/* TTS inside flashcard */
+.btn-tts {
+  background: rgba(28,176,246,0.1);
+  border: none;
+  cursor: pointer;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  color: var(--blue);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+.btn-tts:hover { background: rgba(28,176,246,0.2); transform: scale(1.1); }
+
+.btn-tts-large {
+  background: rgba(28,176,246,0.1);
+  border: none;
+  cursor: pointer;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  color: var(--blue);
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.btn-tts-large:hover { background: rgba(28,176,246,0.2); transform: scale(1.1); }
