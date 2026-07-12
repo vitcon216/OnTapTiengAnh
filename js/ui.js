@@ -121,13 +121,24 @@ export class UIManager {
     speak(text, rate = 1) {
         if (!text) return;
         
-        // Sử dụng giọng đọc mặc định của máy (Web Speech API) để đảm bảo độ ổn định tối đa trên iOS Safari PWA
-        this.synth.cancel();
-        const utt  = new SpeechSynthesisUtterance(text);
-        utt.lang   = 'en-US';
-        utt.rate   = rate;
-        utt.pitch  = 1;
-        this.synth.speak(utt);
+        // Sử dụng Google TTS API để đồng bộ giọng đọc trên mọi thiết bị
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en-US&client=tw-ob&q=${encodeURIComponent(text)}`;
+        this.ttsAudio.src = url;
+        this.ttsAudio.playbackRate = rate;
+        this.ttsAudio.volume = 1;
+        
+        const p = this.ttsAudio.play();
+        if (p !== undefined) {
+            p.catch(err => {
+                console.warn("Lỗi tải âm thanh từ Google TTS:", err);
+                this.synth.cancel();
+                const utt  = new SpeechSynthesisUtterance(text);
+                utt.lang   = 'en-US';
+                utt.rate   = rate;
+                utt.pitch  = 1;
+                this.synth.speak(utt);
+            });
+        }
     }
 
     /* ── Toast ───────────────────────────────── */
