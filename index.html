@@ -244,6 +244,9 @@
                     <button class="btn btn-ghost btn-sm" id="btn-shuffle">
                         <i class="ph ph-shuffle"></i> Shuffle
                     </button>
+                    <button class="btn btn-primary btn-sm" id="btn-review-list">
+                        <i class="ph ph-pencil-simple"></i> Ôn tập
+                    </button>
                 </div>
             </div>
             <p class="word-count-label" id="word-count-label">Hiển thị 0 từ</p>
@@ -326,6 +329,11 @@
                         <i class="ph-fill ph-check-square-offset"></i>
                         <h4>Trắc nghiệm</h4>
                         <p>Chọn đúng trong 4 đáp án</p>
+                    </div>
+                    <div class="quiz-card-option" id="quiz-by-list-btn">
+                        <i class="ph-fill ph-list-dashes"></i>
+                        <h4>Ôn theo List</h4>
+                        <p>Chọn 1 list để ôn tập</p>
                     </div>
                     <div class="quiz-card-option" data-type="fill-blank">
                         <i class="ph-fill ph-keyboard"></i>
@@ -501,6 +509,20 @@
                 <p id="modal-example"></p>
                 <p id="modal-translation" class="example-vi"></p>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== QUIZ BY LIST MODAL ===== -->
+<div class="modal-backdrop hidden" id="quiz-list-modal-backdrop">
+    <div class="modal" id="quiz-list-modal">
+        <button class="modal-close" id="quiz-list-modal-close"><i class="ph ph-x"></i></button>
+        <div class="modal-body" style="padding: 24px;">
+            <h2 style="margin-bottom: 16px; font-size: 1.5em; text-align: center;">Chọn List để Ôn tập</h2>
+            <select id="quiz-list-select" class="select-input" style="width: 100%; margin-bottom: 24px; padding: 12px; font-size: 16px;">
+                <!-- Topics will be populated here -->
+            </select>
+            <button class="btn btn-primary btn-full" id="quiz-list-start-btn" style="font-size: 16px; padding: 14px;">Bắt đầu Ôn tập</button>
         </div>
     </div>
 </div>

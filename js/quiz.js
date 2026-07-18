@@ -13,7 +13,7 @@ export class QuizMode {
     }
 
     init() {
-        document.querySelectorAll('.quiz-card-option').forEach(card => {
+        document.querySelectorAll('.quiz-card-option[data-type]').forEach(card => {
             card.addEventListener('click', () => this._startQuiz(card.dataset.type));
         });
         document.getElementById('quiz-exit').addEventListener('click', () => this._exitQuiz());
@@ -24,10 +24,21 @@ export class QuizMode {
     startWrongWords() { this._startQuiz('wrong-words'); }
     startDailyNew() { this._startQuiz('daily-new'); }
     startQuickReviewMixed() { this._startQuiz('quick-review-mixed'); }
+    startCustomReview(words) { this._startQuiz('custom-list', words); }
 
     /* ── Quiz lifecycle ─────────────────────── */
-    _startQuiz(type) {
-        if (type === 'daily-new') {
+    _startQuiz(type, customPool = null) {
+        if (type === 'custom-list') {
+            if (!customPool || customPool.length === 0) {
+                this.ui.toast('Không có từ nào cần ôn tập!', 'info');
+                return;
+            }
+            this.questions = this.ui.shuffle([...customPool]).slice(0, 50);
+            this.hearts = 3;
+            this.type = 'multiple-choice';
+            this.idx = 0;
+            this.answered = false;
+        } else if (type === 'daily-new') {
             const dailyPool = this.dm.getDailyNewWords();
             if (dailyPool.length === 0) {
                 this.ui.toast('Bạn đã học hết tất cả từ vựng rồi!', 'info');
@@ -56,7 +67,7 @@ export class QuizMode {
         }
 
         this.idx       = 0;
-        this.type      = type === 'spaced-rep' || type === 'wrong-words' ? 'multiple-choice' : type;
+        this.type      = (type === 'spaced-rep' || type === 'wrong-words' || type === 'custom-list') ? 'multiple-choice' : type;
         this.answered  = false;
 
         document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
@@ -79,14 +90,15 @@ export class QuizMode {
         const body = document.getElementById('quiz-body');
         body.innerHTML = '';
 
-        if (this.type === 'daily-new' || this.type === 'quick-review-mixed') {
-            const modes = ['flashcard', 'multiple-choice', 'fill-blank', 'listening'];
+        if (this.type === 'daily-new') {
+            const modes = ['flashcard', 'multiple-choice', 'listening'];
             const randomMode = modes[Math.floor(Math.random() * modes.length)];
             
             if (randomMode === 'flashcard') this._renderFlashcard(w, body);
             else if (randomMode === 'multiple-choice') this._renderMC(w, body);
-            else if (randomMode === 'fill-blank') this._renderFill(w, body);
             else if (randomMode === 'listening') this._renderListen(w, body);
+        } else if (this.type === 'quick-review-mixed') {
+            this._renderMC(w, body);
         } else {
             if (this.type === 'multiple-choice') this._renderMC(w, body);
             else if (this.type === 'fill-blank') this._renderFill(w, body);

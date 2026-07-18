@@ -88,9 +88,45 @@ class App {
             this._refreshStats();
         });
 
+        // ── 10.5. Quiz List Modal ──
+        this._initQuizListModal();
+
         // ── 11. Initial render ──
         this._onViewEnter('dashboard');
         this._refreshStats();
+    }
+
+    _initQuizListModal() {
+        const btn = document.getElementById('quiz-by-list-btn');
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+            const sel = document.getElementById('quiz-list-select');
+            const topics = this.dm.getTopics();
+            sel.innerHTML = '';
+            topics.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t;
+                sel.appendChild(opt);
+            });
+            document.getElementById('quiz-list-modal-backdrop').classList.remove('hidden');
+        });
+
+        document.getElementById('quiz-list-modal-close').addEventListener('click', () => {
+            document.getElementById('quiz-list-modal-backdrop').classList.add('hidden');
+        });
+
+        document.getElementById('quiz-list-modal-backdrop').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) document.getElementById('quiz-list-modal-backdrop').classList.add('hidden');
+        });
+
+        document.getElementById('quiz-list-start-btn').addEventListener('click', () => {
+            const topic = document.getElementById('quiz-list-select').value;
+            if (!topic) return;
+            document.getElementById('quiz-list-modal-backdrop').classList.add('hidden');
+            const words = this.dm.words.filter(w => w.topic === topic);
+            this.qz.startCustomReview(words);
+        });
     }
 
     /* ── View enter hook ─────────────────────── */
@@ -122,6 +158,14 @@ class App {
         document.getElementById('btn-shuffle').addEventListener('click', () => {
             this._shuffled = true;
             this._filterAndRender();
+        });
+        document.getElementById('btn-review-list').addEventListener('click', () => {
+            if (!this._currentFilteredWords || this._currentFilteredWords.length === 0) {
+                this.ui.toast('Danh sách hiện tại không có từ nào!', 'error');
+                return;
+            }
+            this.ui.navigate('quiz');
+            this.qz.startCustomReview(this._currentFilteredWords);
         });
     }
 
@@ -157,6 +201,7 @@ class App {
         if (status === 'favorite')  words = words.filter(w => this.dm.progress[w.id]?.isFavorite);
 
         if (this._shuffled) { words = this.ui.shuffle(words); this._shuffled = false; }
+        this._currentFilteredWords = words; // Save for custom review
 
         this.ui.renderWordList(words, {
             onFavorite: (id) => { this.dm.toggleFavorite(id); this._filterAndRender(); },
