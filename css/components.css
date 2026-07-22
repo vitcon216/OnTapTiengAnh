@@ -87,7 +87,16 @@
   justify-content: center;
   transition: background 0.15s, color 0.15s;
 }
-.btn-icon:hover { background: var(--surface2); color: var(--text); }
+.btn-icon:hover { color: var(--primary); }
+
+/* ── Tags ── */
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
 
 /* TTS inside flashcard */
 .btn-tts {

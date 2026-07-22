@@ -53,6 +53,14 @@
             <i class="ph ph-game-controller"></i>
             <span>Ôn tập</span>
         </li>
+        <li class="nav-item" data-view="toeic" id="nav-toeic">
+            <i class="ph ph-certificate"></i>
+            <span>TOEIC Practice</span>
+        </li>
+        <li class="nav-item" data-view="toeic-vocab-part" id="nav-toeic-vocab-part">
+            <i class="ph ph-list-numbers"></i>
+            <span>Từ vựng theo Part</span>
+        </li>
         <li class="nav-item" data-view="stats" id="nav-stats">
             <i class="ph ph-chart-bar"></i>
             <span>Thống kê</span>
@@ -207,12 +215,12 @@
                     <h4>Nghe &amp; Chọn</h4>
                     <p>Nghe phát âm</p>
                 </div>
-                <div class="mode-card" data-mode="spaced-rep">
-                    <div class="mode-icon" style="background:rgba(255,75,75,0.12);color:#FF4B4B">
-                        <i class="ph-fill ph-brain"></i>
+                <div class="mode-card" data-mode="spaced-rep" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(79, 70, 229, 0.05)); border-color: rgba(139, 92, 246, 0.3);">
+                    <div class="mode-icon" style="background:linear-gradient(135deg, #8B5CF6, #4F46E5);color:#fff">
+                        <i class="ph-fill ph-magic-wand"></i>
                     </div>
-                    <h4>Spaced Rep</h4>
-                    <p>Ôn thông minh</p>
+                    <h4>Ôn tập thông minh</h4>
+                    <p>Học qua Ngữ cảnh AI</p>
                 </div>
                 <div class="mode-card" data-mode="quiz-wrong">
                     <div class="mode-icon" style="background:rgba(249,115,22,0.12);color:#F97316">
@@ -220,6 +228,20 @@
                     </div>
                     <h4>Ôn từ sai</h4>
                     <p>Luyện lại từ yếu</p>
+                </div>
+                <div class="mode-card" data-mode="toeic-practice">
+                    <div class="mode-icon" style="background:rgba(79,70,229,0.12);color:#4F46E5">
+                        <i class="ph-fill ph-certificate"></i>
+                    </div>
+                    <h4>TOEIC Practice</h4>
+                    <p>Mô phỏng đề thi</p>
+                </div>
+                <div class="mode-card" data-mode="toeic-vocab-part">
+                    <div class="mode-icon" style="background:rgba(236,72,153,0.12);color:#EC4899">
+                        <i class="ph-fill ph-books"></i>
+                    </div>
+                    <h4>Từ Vựng TOEIC</h4>
+                    <p>Học theo Reading/Listening</p>
                 </div>
             </div>
         </section>
@@ -375,6 +397,82 @@
             </div>
         </section>
 
+        <!-- ── TOEIC PRACTICE ── -->
+        <section class="view hidden" id="view-toeic">
+            <!-- Setup screen -->
+            <div id="toeic-setup">
+                <div class="setup-hero">
+                    <div class="setup-hero-icon"><i class="ph-fill ph-certificate"></i></div>
+                    <h2>TOEIC Practice</h2>
+                    <p>Sinh đề ngẫu nhiên từ danh sách từ vựng đã học</p>
+                </div>
+                <div class="setup-options">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600">Chọn mức độ (Số lượng câu):</label>
+                        <select id="toeic-difficulty" class="select-input" style="width:100%;padding:12px;font-size:16px;">
+                            <option value="easy">Easy (5 câu)</option>
+                            <option value="medium">Medium (10 câu)</option>
+                            <option value="hard">Hard (20 câu)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-full" id="toeic-generate-btn">
+                        <i class="ph-fill ph-play"></i> Bắt đầu làm bài
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active session -->
+            <div id="toeic-active" class="hidden">
+                <div class="quiz-header">
+                    <button class="btn-icon" id="toeic-exit"><i class="ph ph-arrow-left"></i></button>
+                    <div class="progress-track" style="flex:1;margin:0 16px">
+                        <div class="progress-fill" id="toeic-progress" style="width:0%"></div>
+                    </div>
+                    <div style="font-weight:600;font-variant-numeric:tabular-nums;color:var(--text2);display:flex;align-items:center;gap:4px;">
+                        <i class="ph-fill ph-clock"></i> <span id="toeic-timer">00:00</span>
+                    </div>
+                    <div style="margin-left:12px;font-weight:bold;color:var(--primary);" id="toeic-counter">0/0</div>
+                </div>
+                <div class="quiz-body" id="toeic-body">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+            
+            <!-- Result screen -->
+            <div id="toeic-result" class="hidden" style="text-align:center;padding:40px 20px;">
+                <i class="ph-fill ph-trophy" style="font-size:80px;color:var(--yellow);margin-bottom:16px;"></i>
+                <h2 style="font-size:28px;margin-bottom:24px;">Hoàn thành bài thi!</h2>
+                <div class="stats-row" style="margin-bottom:32px;justify-content:center;">
+                    <div class="stat-card" style="flex:unset;min-width:120px;">
+                        <div class="stat-icon green"><i class="ph-fill ph-check-circle"></i></div>
+                        <div class="stat-body">
+                            <p class="stat-value" id="toeic-res-score">0 / 0</p>
+                            <p class="stat-label">Kết quả</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="flex:unset;min-width:120px;">
+                        <div class="stat-icon blue"><i class="ph-fill ph-target"></i></div>
+                        <div class="stat-body">
+                            <p class="stat-value" id="toeic-res-accuracy">0%</p>
+                            <p class="stat-label">Độ chính xác</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="flex:unset;min-width:120px;">
+                        <div class="stat-icon orange"><i class="ph-fill ph-clock"></i></div>
+                        <div class="stat-body">
+                            <p class="stat-value" id="toeic-res-time">00:00</p>
+                            <p class="stat-label">Thời gian</p>
+                        </div>
+                    </div>
+                </div>
+                <h3 style="color:var(--primary);margin-bottom:32px;font-size:24px;" id="toeic-res-xp">+0 XP</h3>
+                <div style="display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto;">
+                    <button class="btn btn-primary btn-full" id="toeic-review-wrong-btn" style="display:none;">Ôn lại câu sai</button>
+                    <button class="btn btn-outline btn-full" id="toeic-practice-again-btn">Tạo đề mới</button>
+                </div>
+            </div>
+        </section>
+
         <!-- ── STATS ── -->
         <section class="view hidden" id="view-stats">
             <h2 class="section-title">Thống kê học tập</h2>
@@ -411,6 +509,20 @@
         <!-- ── SETTINGS ── -->
         <section class="view hidden" id="view-settings">
             <h2 class="section-title">Cài đặt</h2>
+
+            <div class="card settings-section">
+                <h3>Tích hợp AI (Sinh câu động)</h3>
+                <div class="setting-row" style="flex-wrap: wrap; gap: 10px;">
+                    <div class="setting-info" style="flex: 1; min-width: 250px;">
+                        <p class="setting-title">Gemini API Key</p>
+                        <p class="setting-desc">Dùng để sinh câu hỏi ngữ cảnh TOEIC tự động. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary)">Nhận API Key miễn phí</a></p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text);">
+                        <button class="btn btn-primary btn-sm" id="btn-save-gemini-key">Lưu Key</button>
+                    </div>
+                </div>
+            </div>
 
             <div class="card settings-section">
                 <h3>Dữ liệu từ vựng</h3>
@@ -485,6 +597,92 @@
             </div>
         </section>
 
+        <!-- ── TOEIC VOCAB PART VIEW ── -->
+        <section class="view hidden" id="view-toeic-vocab-part">
+            <div class="toolbar">
+                <button class="btn-icon" id="btn-back-home-toeic-vocab" title="Trang chủ">
+                    <i class="ph ph-house"></i>
+                </button>
+                <h2>Từ Vựng TOEIC (Theo Part)</h2>
+            </div>
+            <div id="toeic-vocab-part-container"></div>
+            <!-- The quiz container for fill-in-the-blank practice -->
+            <div id="toeic-vocab-quiz-container" class="hidden"></div>
+        </section>
+
+        <!-- ── AI CONTEXT VIEW ── -->
+        <section class="view hidden" id="view-ai-context" style="height: calc(100vh - 60px); display: flex; flex-direction: column;">
+            <div id="ai-context-setup" style="padding: 20px; max-width: 800px; margin: 0 auto; width: 100%;">
+                <button class="btn btn-icon" id="btn-quit-ai-setup" style="margin-bottom: 20px;"><i class="ph-bold ph-arrow-left"></i></button>
+                <h2 style="margin-bottom: 20px; color: var(--primary);">Chọn định dạng bài học</h2>
+                <div class="quiz-grid" id="ai-mode-selection">
+                    <div class="quiz-card-option" data-ai-mode="story">
+                        <i class="ph-fill ph-book-open"></i>
+                        <h4>Short Story</h4>
+                        <p>Câu chuyện ngắn</p>
+                    </div>
+                    <div class="quiz-card-option" data-ai-mode="dialogue">
+                        <i class="ph-fill ph-chats"></i>
+                        <h4>Dialogue</h4>
+                        <p>Đoạn hội thoại</p>
+                    </div>
+                    <div class="quiz-card-option" data-ai-mode="email">
+                        <i class="ph-fill ph-envelope"></i>
+                        <h4>Email</h4>
+                        <p>Email chuẩn TOEIC</p>
+                    </div>
+                    <div class="quiz-card-option" data-ai-mode="article">
+                        <i class="ph-fill ph-newspaper"></i>
+                        <h4>Notice / Article</h4>
+                        <p>Thông báo, Bài báo</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="btn btn-primary" id="btn-start-ai-context" style="font-size: 16px; padding: 12px 30px; width: 100%; max-width: 300px;" disabled>
+                        Bắt đầu tạo bài <i class="ph-bold ph-magic-wand"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="ai-context-loading" class="hidden" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <div class="spinner" style="width:50px; height:50px; border:4px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite;"></div>
+                <h3 style="margin-top:20px; color:var(--text1);">AI đang soạn bài...</h3>
+                <p style="color:var(--text3); margin-top:10px;">Quá trình này có thể mất 10-15 giây</p>
+                <style>@keyframes spin { 100% { transform:rotate(360deg); } }</style>
+            </div>
+
+            <div id="ai-context-workspace" class="hidden" style="flex: 1; display: flex; overflow: hidden; background: var(--bg2);">
+                <!-- Left panel: Reading Passage -->
+                <div id="ai-context-passage-panel" style="flex: 1; border-right: 1px solid var(--border); background: var(--bg1); display: flex; flex-direction: column; overflow: hidden;">
+                    <div style="padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface1);">
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn btn-icon" id="btn-ai-context-quit"><i class="ph-bold ph-x"></i></button>
+                            <button class="btn btn-outline" id="btn-ai-context-read-aloud"><i class="ph-fill ph-speaker-high"></i> Đọc đoạn văn</button>
+                            <button class="btn btn-outline" id="btn-ai-context-translate"><i class="ph-fill ph-translate"></i> Ẩn/Hiện dịch</button>
+                        </div>
+                    </div>
+                    <div id="ai-context-passage-content" style="flex: 1; overflow-y: auto; padding: 20px 30px; font-size: 16px; line-height: 1.8; color: var(--text1);">
+                        <!-- Passage content goes here -->
+                    </div>
+                </div>
+
+                <!-- Right panel: Questions -->
+                <div id="ai-context-quiz-panel" style="width: 400px; background: var(--bg2); display: flex; flex-direction: column; overflow: hidden;">
+                    <div style="padding: 15px; border-bottom: 1px solid var(--border); text-align: center; font-weight: bold; color: var(--primary);">
+                        Câu hỏi (<span id="ai-context-q-progress">0/0</span>)
+                    </div>
+                    <div id="ai-context-quiz-content" style="flex: 1; overflow-y: auto; padding: 20px;">
+                        <!-- Question content goes here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Screen -->
+            <div id="ai-context-summary" class="hidden" style="padding: 40px; max-width: 800px; margin: 0 auto; width: 100%; text-align: center;">
+                <!-- Summary content -->
+            </div>
+        </section>
+
     </main>
 </div>
 
@@ -540,7 +738,8 @@
 <!-- ===== TOAST ===== -->
 <div id="toast-container"></div>
 
-<script type="module" src="js/app.js"></script>
+        <!-- view-toeic-vocab-part was moved inside main -->
+        <script type="module" src="js/app.js?v=2"></script>
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -549,6 +748,16 @@
                 .catch(err => console.error('Service Worker registration failed', err));
         });
     }
+    
+    // Add global keyboard support for TOEIC modal Enter key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const nextBtn = document.querySelector('#toeic-body .btn-primary');
+            if (nextBtn && !nextBtn.disabled) {
+                nextBtn.click();
+            }
+        }
+    });
 </script>
 </body>
 </html>

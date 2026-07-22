@@ -34,7 +34,7 @@ export class DataManager {
     }
 
     async _fetchWords() {
-        const resp = await fetch('data/words.json');
+        const resp = await fetch('data/words.json?v=' + Date.now());
         if (!resp.ok) throw new Error(`Cannot load data/words.json (${resp.status})`);
         const raw = await resp.json();
         // Normalise IDs

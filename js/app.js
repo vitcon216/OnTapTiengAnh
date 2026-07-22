@@ -1,10 +1,14 @@
 /**
  * app.js — Main entry point. Wires all modules together.
  */
-import { DataManager  } from './data.js';
-import { UIManager    } from './ui.js';
-import { FlashcardMode} from './flashcard.js';
-import { QuizMode     } from './quiz.js';
+import { DataManager  } from './data.js?v=2';
+import { UIManager    } from './ui.js?v=2';
+import { FlashcardMode} from './flashcard.js?v=2';
+import { QuizMode     } from './quiz.js?v=2';
+import { ToeicMode    } from './toeic.js?v=2';
+import { ToeicVocabPartMode } from './toeic-vocab-part.js?v=2';
+import { ToeicQuizAdvancedMode } from './toeic-quiz-advanced.js?v=2';
+import { ToeicQuizAiMode } from './toeic-quiz-ai.js?v=2';
 
 class App {
     constructor() {
@@ -12,6 +16,10 @@ class App {
         this.ui = new UIManager(this.dm);
         this.fc = new FlashcardMode(this.dm, this.ui);
         this.qz = new QuizMode(this.dm, this.ui);
+        this.toeic = new ToeicMode(this.dm, this.ui);
+        this.toeicQuizAdvanced = new ToeicQuizAdvancedMode(this.dm, this.ui);
+        this.toeicQuizAi = new ToeicQuizAiMode(this.dm, this.ui);
+        this.toeicVocabPart = new ToeicVocabPartMode(this.dm, this.ui, this.toeicQuizAdvanced, this.toeicQuizAi);
     }
 
     async start() {
@@ -31,6 +39,20 @@ class App {
         // ── 3. Bootstrap modes ──
         this.fc.init();
         this.qz.init();
+        this.toeic.init();
+
+        const aiContextBtn = document.querySelector('.quiz-card-option[data-type="ai-context"]');
+        if (aiContextBtn) {
+            aiContextBtn.addEventListener('click', () => {
+                const allWords = this.dm.data.words || [];
+                const learned = allWords.filter(w => w.srs && w.srs.reviews > 0);
+                if (learned.length === 0) {
+                    this.ui.toast('Bạn cần học (Spaced Repetition) vài từ trước khi có thể ôn ngữ cảnh nhé!', 'info');
+                    return;
+                }
+                this.toeicQuizAi.start(learned, 'quiz');
+            });
+        }
 
         // ── 4. Navigation ──
         document.querySelectorAll('.nav-item').forEach(li => {
@@ -60,11 +82,24 @@ class App {
             card.addEventListener('click', () => {
                 const mode = card.dataset.mode;
                 if (mode === 'flashcards')  { this.ui.navigate('flashcards'); this._onViewEnter('flashcards'); }
-                if (mode === 'quiz-mc')     { this.ui.navigate('quiz');      this._startQuizType('multiple-choice'); }
-                if (mode === 'quiz-fill')   { this.ui.navigate('quiz');      this._startQuizType('fill-blank'); }
-                if (mode === 'quiz-listen') { this.ui.navigate('quiz');      this._startQuizType('listening'); }
-                if (mode === 'spaced-rep')  { this.ui.navigate('quiz');      this.qz.startSpacedRep(); }
-                if (mode === 'quiz-wrong')  { this.ui.navigate('quiz');      this.qz.startWrongWords(); }
+                else if (mode === 'quiz-mc')     { this.ui.navigate('quiz');      this._startQuizType('multiple-choice'); }
+                else if (mode === 'quiz-fill')   { this.ui.navigate('quiz');      this._startQuizType('fill-blank'); }
+                else if (mode === 'quiz-listen') { this.ui.navigate('quiz');      this._startQuizType('listening'); }
+                else if (mode === 'spaced-rep')  { 
+                    let pool = this.dm.dueWords && this.dm.dueWords.length >= 5 ? this.dm.dueWords : this.dm.learnedWords;
+                    if (!pool || pool.length < 5) {
+                        // Fallback to random words so they can try the feature
+                        pool = [...this.dm.words].sort(() => 0.5 - Math.random()).slice(0, 10);
+                        this.ui.toast('Đang dùng từ ngẫu nhiên vì bạn chưa học đủ 5 từ!', 'info');
+                    }
+                    this.toeicQuizAi.start(pool, 'dashboard'); 
+                }
+                else if (mode === 'quiz-wrong')  { this.ui.navigate('quiz');      this.qz.startWrongWords(); }
+                else if (mode === 'toeic-practice') { this.ui.navigate('toeic');  this.toeic.start(); }
+                else if (mode === 'toeic-vocab-part') { 
+                    this.ui.navigate('toeic-vocab-part');
+                    this.toeicVocabPart.start(); 
+                }
             });
         });
 
@@ -141,6 +176,12 @@ class App {
         }
         if (view === 'stats') {
             this.ui.updateStatsPage();
+        }
+        if (view === 'toeic') {
+            this.toeic.start();
+        }
+        if (view === 'toeic-vocab-part') {
+            this.toeicVocabPart.start();
         }
     }
 
@@ -221,6 +262,28 @@ class App {
 
     /* ── Settings ────────────────────────────── */
     _initSettings() {
+        // AI Integration - Gemini API Key
+        const apiKeyInput = document.getElementById('gemini-api-key-input');
+        const btnSaveKey = document.getElementById('btn-save-gemini-key');
+        
+        if (apiKeyInput && btnSaveKey) {
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if (savedKey) {
+                apiKeyInput.value = savedKey;
+            }
+            
+            btnSaveKey.addEventListener('click', () => {
+                const key = apiKeyInput.value.trim();
+                if (key) {
+                    localStorage.setItem('gemini_api_key', key);
+                    this.ui.toast('Đã lưu Gemini API Key thành công!', 'success');
+                } else {
+                    localStorage.removeItem('gemini_api_key');
+                    this.ui.toast('Đã xóa Gemini API Key.', 'info');
+                }
+            });
+        }
+
         // Import words JSON
         document.getElementById('import-words-file').addEventListener('change', (e) => {
             this._readJSON(e.target.files[0], (data) => {

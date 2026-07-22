@@ -177,8 +177,46 @@ export class QuizMode {
     }
 
     /* ── Fill Blank ──────────────────────────── */
+    _blankOutWord(text, word, placeholder) {
+        if (!text) return null;
+        // 1. Exact match
+        let regex = new RegExp(`\\b${word}\\b`, 'gi');
+        let res = text.replace(regex, placeholder);
+        if (res !== text) return res;
+        
+        // 2. Simple suffixes
+        regex = new RegExp(`\\b${word}(?:s|es|d|ed|ing|ly)\\b`, 'gi');
+        res = text.replace(regex, placeholder);
+        if (res !== text) return res;
+        
+        // 3. Remove last letter
+        if (word.length > 3) {
+            const base1 = word.slice(0, -1);
+            regex = new RegExp(`\\b${base1}(?:ing|ed|ies|ied|y|ily|ion|ation|ment)\\b`, 'gi');
+            res = text.replace(regex, placeholder);
+            if (res !== text) return res;
+        }
+        
+        // 4. Remove last two letters
+        if (word.length > 4) {
+            const base2 = word.slice(0, -2);
+            regex = new RegExp(`\\b${base2}[a-z]{1,4}\\b`, 'gi');
+            res = text.replace(regex, placeholder);
+            if (res !== text) return res;
+        }
+        
+        // 5. Fallback case-insensitive search
+        if (word.length > 3) {
+            regex = new RegExp(word, 'gi');
+            res = text.replace(regex, placeholder);
+            if (res !== text) return res;
+        }
+
+        return null;
+    }
+
     _renderFill(w, body) {
-        const blank = (w.example || '').replace(new RegExp(`\\b${w.word}\\b`, 'gi'), '_______');
+        const blank = this._blankOutWord(w.example, w.word, '_______');
         body.innerHTML = `
             <p class="quiz-question-label">Điền từ vào chỗ trống:</p>
             <p class="quiz-question">${blank || `Nghĩa: "${w.meaning}"`}</p>

@@ -785,6 +785,118 @@ kbd {
 .hidden { display: none !important; }
 .mt-1   { margin-top: 8px; }
 
+/* ── TOEIC Practice ── */
+.toeic-q-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.toeic-part-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+.toeic-q-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.5;
+}
+.toeic-passage {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  font-size: 16px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.toeic-blank {
+  display: inline-block;
+  padding: 0 12px;
+  border-bottom: 2px solid var(--text);
+  font-weight: bold;
+  color: var(--text);
+  margin: 0 4px;
+}
+.toeic-explanation {
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(28,176,246,0.1);
+  border-left: 4px solid var(--blue);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  color: var(--text);
+}
+/* ── TOEIC Parts View ── */
+.toeic-parts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+.toeic-part-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  cursor: pointer;
+  transition: transform var(--duration) var(--ease), box-shadow var(--duration) var(--ease), border-color var(--duration) var(--ease);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toeic-part-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--blue);
+}
+.part-card-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+.part-card-desc {
+  font-size: 14px;
+  color: var(--text2);
+}
+.part-card-count {
+  margin-top: auto;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue);
+  background: rgba(28,176,246,0.1);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  align-self: flex-start;
+}
+.toeic-part-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.btn-back-parts {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-back-parts:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .stats-row { grid-template-columns: repeat(2, 1fr); }
